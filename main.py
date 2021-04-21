@@ -1,7 +1,8 @@
 
+##v1
 import argparse
 from network import wizard
-
+from pipelines import *
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='PyTorch MNIST Training')
@@ -22,9 +23,9 @@ if __name__ == "__main__":
                         help='fraction between train/validation set')
 
     
-    
+    train_set, train_label, test_set, test_label = data_loader()
     model = wizard()
-    model.training()
+    model.training(train_set, train_label)
 
 
 
