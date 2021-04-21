@@ -1,57 +1,108 @@
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
-from torchsummary import summary
-from torchvision import datasets, transforms
-import torch.optim as optim
-from models import WizardNet
-from dataloader import data_loader
+import numpy as np
 
 
-dir='dataset/'
-def train(log_interval, model, device, train_loader, optimizer, epoch):
-    model.train()
-    for batch_idx, (data, target) in enumerate(train_loader):
-        data, target = data.to(device), target.to(device)
-        optimizer.zero_grad()
-        output = model(data)
-        loss = F.nll_loss(output, target)
-        loss.backward()
-        optimizer.step()
-        if batch_idx % log_interval == 0:
-            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                epoch, batch_idx * len(data), len(train_loader.sampler),
-                100. * batch_idx / len(train_loader), loss.item()))
 
-def test(model, device, data_loader):
-    model.eval()
-    test_loss = 0
-    correct = 0
-    with torch.no_grad():
-        for data, target in data_loader:
-            data, target = data.to(device), target.to(device)
-            output = model(data)
-            test_loss += F.nll_loss(output, target, reduction='sum').item() # sum up batch loss
-            pred = output.argmax(dim=1, keepdim=True) # get the index of the max log-probability
-            correct += pred.eq(target.view_as(pred)).sum().item()
+label_data_path = 'train_labels.txt'
+train_data_path = 'train_input.txt'
+test_data_path = 'test_input.txt'
+# input_data_path = 'dataset/train_input.txt'
 
-    test_loss /= len(data_loader.dataset)
+label_f = label_data_path
+train_f = train_data_path 
+test_f =  test_data_path 
+train_label = []
+train_data = []
+n_classes = 3
 
-    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
-        test_loss, correct, len(data_loader.dataset),
-        100. * correct / len(data_loader.dataset)))
+def data_loader():
+    global train_data
+    with open(label_f) as f:
+        lines = f.readlines()
+        train_label = np.array(list(map(lambda x: int(x)+1, lines)))
+
+    with open(train_f) as f:
+        lines = f.readlines()        
+        for l in lines:
+            elements = l.split(',')
+            temp = [float(i) for i in elements]
+            train_data.append(temp)
+        train_data = np.array(train_data)
+
+    return train_data, train_label, None, None
+
+def convert_label(x, num_classes):
+    # x = np.arange(num_classes) == x.reshape(label.size, 1) # Convert to one-hot coding
+    # x = x.astype(np.float)
+    x = np.arange(num_classes) == x.reshape(x.size, 1) # Convert to one-hot coding
+    x = x.astype(np.float)
+    return x
+if __name__=="__main__":
+    y,x,_,_ = data_loader()
+    print(x)
+    x = convert_label(x,4)
+    print(x)
 
 
-def prepare_model(args):
-    '''
-        Preparing the model
-    '''
-    use_cuda = torch.cuda.is_available()
-    torch.manual_seed(args.seed)
-    device = torch.device("cuda" if use_cuda else "cpu")
-    model = WizardNet.to(device)
-    train_, val_, test_= mnist_loader(dir, args.)
-    return model, train_, val_, test_, device, weight_file
 
+
+
+
+
+
+# label = np.array(label).T # Transpose
+# label = np.arange(n_classes) == label.reshape(label.size, 1) # Convert to one-hot coding
+# label = label.astype(np.float)
+
+
+# with open(train_f) as f:
+#     lines = f.readlines()
+#     for l in lines:
+#         elements = l.split(',')
+#         temp = [float(i) for i in elements]
+#         train.append(temp)
+# train_t = np.array(train).T # Transpose
+# merge = np.vstack((label,train_t)) # stack them togheter
+# out = merge.T # Transpose again
+
+# # out_str = list(map(str, out)) # map them back to string
+
+# np.savetxt('merge.txt', np.matrix(out), delimiter = ',') # save them to the input data file.
+
+
+# with open(test_f) as f:
+#     lines = f.readlines()
+#     for l in lines:
+#         elements = l.split(',')
+#         temp = [float(i) for i in elements]
+#         test.append(temp)
+
+
+
+
+
+# def data_loader(input_dir, label_dir):
+#     label_f = label_dir
+#     input_f = input_dir
+#     label = []
+#     input = []
+#
+#     with open(label_f) as f:
+#         lines = f.readlines()
+#         label = [int(i) for i in lines]
+#
+#     with open(input_f) as f:
+#         lines = f.readlines()
+#         for l in lines:
+#             elements = l.split(',')
+#             temp = [float(i) for i in elements]
+#             input.append(temp)
+#
+#     scaler = preprocessing.StandardScaler().fit(input)
+#     input_norm = scaler.transform(input)
+#     return input_norm, label
+# if __name__ == "__main__":
+    # training_data, label = data_loader(input_data_path, label_path)
+    # plt.figure(figsize=(20,20))
+    # plt.hist(training_data, label='Fancy labels', density=True)
+    # plt.show()
 
