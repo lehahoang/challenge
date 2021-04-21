@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn import preprocessing
 
 
 
@@ -27,20 +28,16 @@ def data_loader():
             temp = [float(i) for i in elements]
             train_data.append(temp)
         train_data = np.array(train_data)
-
+    
+    scaler = preprocessing.StandardScaler().fit(train_data)
+    train_data = scaler.transform(train_data)
     return train_data, train_label, None, None
 
-def convert_label(x, num_classes):
-    # x = np.arange(num_classes) == x.reshape(label.size, 1) # Convert to one-hot coding
-    # x = x.astype(np.float)
-    x = np.arange(num_classes) == x.reshape(x.size, 1) # Convert to one-hot coding
-    x = x.astype(np.float)
-    return x
+
+
 if __name__=="__main__":
     y,x,_,_ = data_loader()
-    print(x)
-    x = convert_label(x,4)
-    print(x)
+    print(np.max(y), np.min(y), np.mean(y))
 
 
 

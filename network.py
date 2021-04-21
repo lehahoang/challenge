@@ -50,10 +50,8 @@ class wizard():
         x = x.astype(np.float)
         return x
 
-    def training(self, train_set, train_label):       
-        
+    def training(self, train_set, train_label):    
         self.weight_initialization()
-        print(train_label)
         label = self.convert_label(train_label, 3)
 
         for epoch in range(self.epochs): 
@@ -61,14 +59,17 @@ class wizard():
                 print('epoch:',epoch)                   
                 ## Forward pass
                 x = train_input.reshape(train_input.size, 1) 
-                z1 = self.sigmoid(np.dot(self.w1.T, x) + self.b1)
-                z2 = self.softmax(np.dot(self.w2.T, z1) + self.b2)
+                z1 = np.dot(self.w1.T, x) + self.b1
+                a1 = self.sigmoid(a1)                
+                z2 = np.dot(self.w2.T, a1) + self.b2
+                a2 = self.softmax(z2)
                 
                 ## Backward pass
-                error = z2 - target
-                theta2 = error*z2*(1-z2)
-                self.w2 += self.learning_rate * np.dot(z2.T, theta2)
-                self.b2 +=self.learning_rate * np.dot(theta2, z2.T)
+                error = a2 - target
+                
+                
+                self.w2 -= self.learning_rate * np.dot(z2.T, theta2)
+                self.b2 -= self.learning_rate * np.dot(theta2, z2.T)
                 ## backpropagation
                 tmp = np.dot(self.w2.T, error)                               
                 tmp = tmp*z1*(1-z1)
