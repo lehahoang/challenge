@@ -36,8 +36,8 @@ def data_loader():
         train_label = np.array(list(map(lambda x: int(x)+1, lines)))
 
     
-    output = np.array(list(map(lambda x: int(x)-1, train_label)), dtype=np.int8)
-    np.savetxt('out.txt', output, delimiter = ',', fmt='%s')
+    # output = np.array(list(map(lambda x: int(x)-1, train_label)), dtype=np.int8)
+    # np.savetxt('out.txt', output, delimiter = ',', fmt='%s')
     
     with open(test_f) as f:
         lines = f.readlines()        

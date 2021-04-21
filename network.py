@@ -95,8 +95,10 @@ class wizard():
             z2 = softmax(np.dot(self.w2.T, z1) + self.b2)
             predicted_class = np.argmax(z2, axis=0)
 
+    # output = np.array(list(map(lambda x: int(x)-1, predicted_class)), dtype=np.int8)
+    # np.savetxt('out.txt', output, delimiter = ',', fmt='%s')
 if __name__ == "__main__":
     proof=wizard()           
     train_set, train_label, test_set, test_label = data_loader()
     proof.training(train_set, train_label)
-    # wizard.evaluate(test_set, test_label)
+    wizard.evaluate(test_set, test_label)
