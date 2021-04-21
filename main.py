@@ -21,11 +21,14 @@ if __name__ == "__main__":
                         help='Showing loging status after a certain number of batches ')
     parser.add_argument('--split-fraction', type=float, default =0.1,
                         help='fraction between train/validation set')
-
+    args = parser.parse_args()
     
-    train_set, train_label, test_set, test_label = data_loader()
-    model = wizard()
+    train_data, train_label, test_data, test_label = data_loader()
+
+   
+    model = wizard(split_ratio=args.split_fraction)
     model.training(train_set, train_label)
+    model.evaluate(test_data, test_label)
 
 
 

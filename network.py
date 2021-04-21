@@ -10,13 +10,15 @@ class wizard():
                  output_nodes=3,
                  learning_rate=0.01,
                  epochs=1,
-                 train_batch_size=1):
+                 train_batch_size=1,
+                 split_ratio=0.1):
                  self.input_nodes = input_nodes
                  self.hidden_nodes = hidden_nodes
                  self.output_nodes = output_nodes
                  self.learning_rate = learning_rate
                  self.epochs = epochs
-                 self.train_batch_size = train_batch_size                    
+                 self.train_batch_size = train_batch_size     
+                 self.split_ratio = split_ratio               
                  self.w1 = []
                  self.w2 = []
                  self.b1 = []
@@ -50,24 +52,33 @@ class wizard():
         x = x.astype(np.float)
         return x
 
-    def training(self, train_set, train_label):    
+    def training(self, train_set_data, train_label_data):    
         self.weight_initialization()
+        train_set = []
+        train_label =[]        
+        val_set = []
+        val_label = []
+        train_set = train_set_data[: int(self.split_ratio*len(train_label_data))]
+        train_label = train_label_data[:int(self.split_ratio*len(train_label_data))]
+        val_set = train_set_data[int(self.split_ratio*len(train_label_data)):]
+        val_label = train_label_data[int(self.split_ratio*len(train_label_data)):]
+        
         label = self.convert_label(train_label, 3)
 
         for epoch in range(self.epochs): 
-            for train_input, target in zip(train_set, label):     
+            for train_input, target in zip(train_set, train_label):     
                 print('epoch:',epoch)                   
                 ## Forward pass
                 x = train_input.reshape(train_input.size, 1) 
                 z1 = np.dot(self.w1.T, x) + self.b1
-                a1 = self.sigmoid(a1)                
+                a1 = self.sigmoid(z1)                
                 z2 = np.dot(self.w2.T, a1) + self.b2
                 a2 = self.softmax(z2)
                 
                 ## Backward pass
                 error = a2 - target
                 
-                
+
                 self.w2 -= self.learning_rate * np.dot(z2.T, theta2)
                 self.b2 -= self.learning_rate * np.dot(theta2, z2.T)
                 ## backpropagation
@@ -78,8 +89,8 @@ class wizard():
        
 
     def evaluate(self, test_set, test_label):
-        for test_input, target in enumerate(test_set, label):            
-            x = train_input.reshape(test_input.size, 1) 
+        for test_input, target in (test_set, test_label):            
+            x = test_input.reshape(test_input.size, 1) 
             z1 = sigmoid(np.dot(self.w1.T, x) + self.b1)
             z2 = softmax(np.dot(self.w2.T, z1) + self.b2)
             predicted_class = np.argmax(z2, axis=0)

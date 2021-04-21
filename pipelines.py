@@ -1,3 +1,4 @@
+##v1
 import numpy as np
 from sklearn import preprocessing
 
@@ -13,14 +14,13 @@ train_f = train_data_path
 test_f =  test_data_path 
 train_label = []
 train_data = []
+test_data = []
+test_label = []
 n_classes = 3
 
 def data_loader():
     global train_data
-    with open(label_f) as f:
-        lines = f.readlines()
-        train_label = np.array(list(map(lambda x: int(x)+1, lines)))
-
+    global test_data
     with open(train_f) as f:
         lines = f.readlines()        
         for l in lines:
@@ -28,11 +28,30 @@ def data_loader():
             temp = [float(i) for i in elements]
             train_data.append(temp)
         train_data = np.array(train_data)
-    
-    scaler = preprocessing.StandardScaler().fit(train_data)
-    train_data = scaler.transform(train_data)
-    return train_data, train_label, None, None
+        scaler = preprocessing.StandardScaler().fit(train_data)
+        train_data = scaler.transform(train_data)
 
+    with open(label_f) as f:
+        lines = f.readlines()
+        train_label = np.array(list(map(lambda x: int(x)+1, lines)))
+
+    
+    output = np.array(list(map(lambda x: int(x)-1, train_label)), dtype=np.int8)
+    np.savetxt('out.txt', output, delimiter = ',', fmt='%s')
+    
+    with open(test_f) as f:
+        lines = f.readlines()        
+        for l in lines:
+            elements = l.split(',')
+            temp = [float(i) for i in elements]
+            test_data.append(temp)
+        test_data = np.array(test_data)
+        scaler = preprocessing.StandardScaler().fit(test_data)
+        test_data = scaler.transform(test_data)
+    
+    test_label = np.zeros(test_data.shape[0])
+    
+    return train_data, train_label, test_data, test_label
 
 
 if __name__=="__main__":
